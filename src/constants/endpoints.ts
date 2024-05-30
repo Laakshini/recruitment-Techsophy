@@ -43,3 +43,6 @@ export const GET_ALL_USERS = "/insurpro-backend/v1/all-users";
 export const USER_SIGN_IN = "/auth/sign_in";
 export const USER_REGISTER = "/auth/register";
 export const REFRESH_TOKEN = "/regenerateToken";
+
+export const GET_JOBS= "/getAllJobs";
+export const ADD_JOBS = "/createJob";

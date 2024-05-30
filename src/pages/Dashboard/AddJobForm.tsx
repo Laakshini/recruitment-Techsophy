@@ -12,15 +12,13 @@ import {
   FormControl,
   InputLabel,
   InputAdornment,
-  FormGroup,
-  FormControlLabel,
-  Checkbox,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import useCustomStyles from "../../hooks/CustomStylesHook";
 import { useTheme } from "@emotion/react";
-import { BorderColor, Clear } from "@mui/icons-material";
-
+import { Clear } from "@mui/icons-material";
+import { request } from "../../services/Request";
+import { ADD_JOBS } from "../../constants/endpoints";
 const cities = [
   "Delhi",
   "Mumbai",
@@ -92,50 +90,46 @@ const AddJobForm: React.FC<JobFormProps> = ({ handleClose }) => {
   const theme = useTheme();
   const classes = useCustomStyles(styles, theme);
 
-  const [employeeType, setEmployeeType] = useState("");
-  const [jobTitle, setJobTitle] = useState("");
-  const [requiredExperience, setRequiredExperience] = useState(0);
-  const [location, setLocation] = useState<string[]>([]);
-  const [jobDescription, setJobDescription] = useState("");
-  const [department, setDepartment] = useState("");
-  const [roleCategory, setRoleCategory] = useState("");
-  const [aboutCompany, setAboutCompany] = useState("");
-  const [clientName, setClientName] = useState("");
-  const [education, setEducation] = useState("");
-  const [keySkills, setKeySkills] = useState<string[]>([]);
-  const [startDate, setStartDate] = useState<Date | null>(null);
-  const [endDate, setEndDate] = useState<Date | null>(null);
-  const [status, setStatus] = useState("");
-  const [openings, setOpenings] = useState(0);
+  const [formState, setFormState] = useState({
+    employmentType: "",
+    jobTitle: "",
+    experience: 0,
+    location: [] as string[],
+    description: "",
+    department: "",
+    roleCategory: "",
+    aboutCompany: "",
+    clientName: "",
+    education: "",
+    keySkills: [] as string[],
+    startDate: null as Date | null,
+    endDate: null as Date | null,
+    status: "",
+    openings: 0,
+  });
 
-  const handleSave = () => {
-    console.log("Employee Type:", employeeType);
-    console.log("Job Title:", jobTitle);
-    console.log("Required Experience:", requiredExperience);
-    console.log("Location:", location);
-    console.log("Job Description:", jobDescription);
-    console.log("Department:", department);
-    console.log("Role Category:", roleCategory);
-    console.log("About Company:", aboutCompany);
-    console.log("Client Name:", clientName);
-    console.log("Education:", education);
-    console.log("Key Skills:", keySkills);
-    console.log("Start Date:", startDate);
-    console.log("End Date:", endDate);
-    console.log("Status:", status);
-    console.log("Openings:", openings);
+  const handleSave = async() => {
+    console.log("Form State:", formState);
+    const response = await request.post(`${process.env.REACT_APP_API_GATEWAY_URL}${ADD_JOBS}`,formState);
+    console.log(response);
+
   };
 
-  const handleClear = (
-    setFunction: React.Dispatch<React.SetStateAction<string>>
-  ): void => {
-    setFunction("");
+  const handleClear = (key: keyof typeof formState): void => {
+    setFormState((prevState) => ({
+      ...prevState,
+      [key]: Array.isArray(prevState[key]) ? [] : "",
+    }));
   };
 
-  const handleClearMultiple = (
-    setFunction: React.Dispatch<React.SetStateAction<string[]>>
+  const handleChange = (
+    key: keyof typeof formState,
+    value: string | number | Date | null | string[]
   ): void => {
-    setFunction([]);
+    setFormState((prevState) => ({
+      ...prevState,
+      [key]: value,
+    }));
   };
 
   return (
@@ -153,24 +147,24 @@ const AddJobForm: React.FC<JobFormProps> = ({ handleClose }) => {
         <TextField
           label="Job Title"
           fullWidth
-          value={jobTitle}
-          onChange={(e) => setJobTitle(e.target.value)}
+          value={formState.jobTitle}
+          onChange={(e) => handleChange("jobTitle", e.target.value)}
           className={classes?.textField}
         />
         <Box className={classes?.rowFlex}>
           <FormControl fullWidth className={classes?.textField}>
             <InputLabel>Employee Type</InputLabel>
             <Select
-              value={employeeType}
-              onChange={(e) => setEmployeeType(e.target.value as string)}
+              value={formState.employmentType}
+              onChange={(e) => handleChange("employmentType", e.target.value)}
               endAdornment={
-                employeeType && (
+                formState.employmentType && (
                   <InputAdornment
                     position="end"
                     className={classes?.closeButton}
                   >
                     <IconButton
-                      onClick={() => handleClear(setEmployeeType)}
+                      onClick={() => handleClear("employmentType")}
                       edge="end"
                     >
                       <Clear />
@@ -188,8 +182,10 @@ const AddJobForm: React.FC<JobFormProps> = ({ handleClose }) => {
             type="number"
             label="Required Experience (in years)"
             fullWidth
-            value={requiredExperience}
-            onChange={(e) => setRequiredExperience(parseInt(e.target.value))}
+            value={formState.experience}
+            onChange={(e) =>
+              handleChange("experience", parseInt(e.target.value))
+            }
             className={classes?.textField}
           />
         </Box>
@@ -199,8 +195,8 @@ const AddJobForm: React.FC<JobFormProps> = ({ handleClose }) => {
             type="date"
             fullWidth
             InputLabelProps={{ shrink: true }}
-            value={startDate ? startDate.toISOString().split("T")[0] : ""}
-            onChange={(e) => setStartDate(new Date(e.target.value))}
+            value={formState.startDate ? formState.startDate.toISOString().split("T")[0] : ""}
+            onChange={(e) => handleChange("startDate", new Date(e.target.value))}
             className={classes?.textField}
           />
           <TextField
@@ -208,8 +204,8 @@ const AddJobForm: React.FC<JobFormProps> = ({ handleClose }) => {
             type="date"
             fullWidth
             InputLabelProps={{ shrink: true }}
-            value={endDate ? endDate.toISOString().split("T")[0] : ""}
-            onChange={(e) => setEndDate(new Date(e.target.value))}
+            value={formState.endDate ? formState.endDate.toISOString().split("T")[0] : ""}
+            onChange={(e) => handleChange("endDate", new Date(e.target.value))}
             className={classes?.textField}
           />
         </Box>
@@ -218,13 +214,13 @@ const AddJobForm: React.FC<JobFormProps> = ({ handleClose }) => {
           <InputLabel>Location</InputLabel>
           <Select
             multiple
-            value={location}
-            onChange={(e) => setLocation(e.target.value as string[])}
+            value={formState.location}
+            onChange={(e) => handleChange("location", e.target.value as string[])}
             endAdornment={
-              location.length > 0 && (
+              formState.location.length > 0 && (
                 <InputAdornment position="end" className={classes?.closeButton}>
                   <IconButton
-                    onClick={() => handleClearMultiple(setLocation)}
+                    onClick={() => handleClear("location")}
                     edge="end"
                   >
                     <Clear />
@@ -243,21 +239,21 @@ const AddJobForm: React.FC<JobFormProps> = ({ handleClose }) => {
         <TextareaAutosize
           minRows={2}
           placeholder="Job Description"
-          value={jobDescription}
-          onChange={(e) => setJobDescription(e.target.value)}
+          value={formState.description}
+          onChange={(e) => handleChange("description", e.target.value)}
           className={`${classes?.textArea} ${classes?.textField}`}
         />
 
         <FormControl fullWidth className={classes?.textField}>
           <InputLabel>Department</InputLabel>
           <Select
-            value={department}
-            onChange={(e) => setDepartment(e.target.value as string)}
+            value={formState.department}
+            onChange={(e) => handleChange("department", e.target.value as string)}
             endAdornment={
-              department && (
+              formState.department && (
                 <InputAdornment position="end" className={classes?.closeButton}>
                   <IconButton
-                    onClick={() => handleClear(setDepartment)}
+                    onClick={() => handleClear("department")}
                     edge="end"
                   >
                     <Clear />
@@ -274,13 +270,13 @@ const AddJobForm: React.FC<JobFormProps> = ({ handleClose }) => {
         <FormControl fullWidth className={classes?.textField}>
           <InputLabel>Role Category</InputLabel>
           <Select
-            value={roleCategory}
-            onChange={(e) => setRoleCategory(e.target.value as string)}
+            value={formState.roleCategory}
+            onChange={(e) => handleChange("roleCategory", e.target.value as string)}
             endAdornment={
-              department && (
+              formState.roleCategory && (
                 <InputAdornment position="end" className={classes?.closeButton}>
                   <IconButton
-                    onClick={() => handleClear(setDepartment)}
+                    onClick={() => handleClear("roleCategory")}
                     edge="end"
                   >
                     <Clear />
@@ -297,35 +293,35 @@ const AddJobForm: React.FC<JobFormProps> = ({ handleClose }) => {
         <TextareaAutosize
           minRows={2}
           placeholder="About Company"
-          value={aboutCompany}
-          onChange={(e) => setAboutCompany(e.target.value)}
+          value={formState.aboutCompany}
+          onChange={(e) => handleChange("aboutCompany", e.target.value)}
           className={`${classes?.textArea} ${classes?.textField}`}
         />
         <TextField
           label="Client Name"
           fullWidth
-          value={clientName}
-          onChange={(e) => setClientName(e.target.value)}
+          value={formState.clientName}
+          onChange={(e) => handleChange("clientName", e.target.value)}
           className={classes?.textField}
         />
         <TextField
           label="Education"
           fullWidth
-          value={education}
-          onChange={(e) => setEducation(e.target.value)}
+          value={formState.education}
+          onChange={(e) => handleChange("education", e.target.value)}
           className={classes?.textField}
         />
         <FormControl fullWidth className={classes?.textField}>
           <InputLabel>Key Skills</InputLabel>
           <Select
             multiple
-            value={keySkills}
-            onChange={(e) => setKeySkills(e.target.value as string[])}
+            value={formState.keySkills}
+            onChange={(e) => handleChange("keySkills", e.target.value as string[])}
             endAdornment={
-              department && (
+              formState.keySkills.length > 0 && (
                 <InputAdornment position="end" className={classes?.closeButton}>
                   <IconButton
-                    onClick={() => handleClear(setDepartment)}
+                    onClick={() => handleClear("keySkills")}
                     edge="end"
                   >
                     <Clear />
@@ -344,13 +340,13 @@ const AddJobForm: React.FC<JobFormProps> = ({ handleClose }) => {
         <FormControl fullWidth className={classes?.textField}>
           <InputLabel>Status</InputLabel>
           <Select
-            value={status}
-            onChange={(e) => setStatus(e.target.value as string)}
+            value={formState.status}
+            onChange={(e) => handleChange("status", e.target.value as string)}
             endAdornment={
-              department && (
+              formState.status && (
                 <InputAdornment position="end" className={classes?.closeButton}>
                   <IconButton
-                    onClick={() => handleClear(setDepartment)}
+                    onClick={() => handleClear("status")}
                     edge="end"
                   >
                     <Clear />
@@ -367,8 +363,8 @@ const AddJobForm: React.FC<JobFormProps> = ({ handleClose }) => {
           type="number"
           label="Openings"
           fullWidth
-          value={openings}
-          onChange={(e) => setOpenings(parseInt(e.target.value))}
+          value={formState.openings}
+          onChange={(e) => handleChange("openings", parseInt(e.target.value))}
           className={classes?.textField}
         />
       </Box>
@@ -385,4 +381,5 @@ const AddJobForm: React.FC<JobFormProps> = ({ handleClose }) => {
     </Paper>
   );
 };
+
 export default AddJobForm;
