@@ -140,7 +140,7 @@ const AddJobForm: React.FC<JobFormProps> = ({ handleClose }) => {
 
   return (
     <Paper className={classes?.jobAddForm}>
-      <Box display="flex" justifyContent="space-between" alignItems="center">
+      <Box className={classes?.rowFlex}>
         <Typography variant="h6" className={classes?.heading}>
           Add Job
         </Typography>
