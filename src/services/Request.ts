@@ -12,8 +12,9 @@ type ApiResponse = unknown;
 
 const callAPI = async (w: ResponseChain): Promise<ApiResponse> => {
   return w
-    .unauthorized((_error) => {
+    .unauthorized((error: any) => {
       // sessionStorage.clear();
+      console.log(error);
       return {
         success: false,
         message: "Please login...",

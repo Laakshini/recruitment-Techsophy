@@ -11,9 +11,11 @@ import { initialAlertState } from "../redux/reducers/NotificationState";
 import LoadSxpChat from "../components/chatWidget";
 import useCustomStyles from "../hooks/CustomStylesHook";
 import { useTheme } from "@emotion/react";
+import CONSTANTS from "../constants/constants";
+import useTokenRefresh from "../hooks/RefreshTokenHook";
 // We use the Material-UI (MUI) library for styling
 
-const styles = (theme: any)=>({
+const styles = (theme: any) => ({
   wrapperContainer: {
     display: "flex",
   },
@@ -27,7 +29,6 @@ const styles = (theme: any)=>({
   },
 });
 
-
 const Wrapper = (props: {
   children:
     | string
@@ -39,6 +40,11 @@ const Wrapper = (props: {
     | null
     | undefined;
 }) => {
+  const initialToken = sessionStorage.getItem(CONSTANTS.REACT_TOKEN) || "";
+  const expiryTimeStr = sessionStorage.getItem("tokenExpiry");
+  const initialExpiryTime = expiryTimeStr ? parseInt(expiryTimeStr, 10) : 0;
+
+  const [token] = useTokenRefresh(initialToken, initialExpiryTime);
   const dispatch = useAppDispatch();
   const themeDataState = useAppSelector((state) => state.UpdateTheme);
   const notifyDataState = useAppSelector((state) => state.NotificationAlert);
@@ -68,10 +74,14 @@ const Wrapper = (props: {
       },
       secondary: {
         main: themeDataState?.secondary,
+        light: themeDataState?.secondaryLight,
         contrastText: "#f8f9fa",
       },
       error: {
         main: themeDataState?.error,
+      },
+      background: {
+        default: themeDataState?.background,
       },
     },
     typography: {
@@ -80,7 +90,7 @@ const Wrapper = (props: {
   });
 
   // Apllication Theme End
-  const classes= useCustomStyles(styles,theme);
+  const classes = useCustomStyles(styles, theme);
 
   return (
     <StyledEngineProvider injectFirst>
@@ -103,7 +113,7 @@ const Wrapper = (props: {
             sx={{
               backgroundColor: (theme) =>
                 theme.palette.mode === "light"
-                  ? theme.palette.grey[100]
+                  ? theme.palette.background.default
                   : theme.palette.grey[900],
             }}
           >
@@ -115,7 +125,7 @@ const Wrapper = (props: {
           </Box>
         </Box>
         {/* <LoadSxpChat /> */}
-        </ThemeProvider>
+      </ThemeProvider>
     </StyledEngineProvider>
   );
 };

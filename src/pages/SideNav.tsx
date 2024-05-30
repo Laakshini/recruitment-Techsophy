@@ -21,6 +21,7 @@ const Drawer = styled(MuiDrawer, {
   "& .MuiDrawer-paper": {
     position: "relative",
     whiteSpace: "nowrap",
+    backgroundColor: theme.palette.secondary.main,
     width: drawerWidth,
     transition: theme.transitions.create("width", {
       easing: theme.transitions.easing.sharp,
@@ -46,7 +47,7 @@ interface NavProps {
   toggleDrawer: () => void;
 }
 
-const styles=(theme:any)=>({
+const styles = (theme: any) => ({
   headerToolbarContainer: {
     display: "flex",
     alignItems: "center",
@@ -66,13 +67,9 @@ const SideNav = ({ open, toggleDrawer }: NavProps) => {
 */
     <Drawer variant="permanent" open={open}>
       <Toolbar className={classes?.headerToolbarContainer}>
-        <img
-          src={theme.palette.mode === "dark" ? DarkLogo : LightLogo}
-          alt="comapny-logo"
-          width={140}
-        />
+        <img src={DarkLogo} alt="comapny-logo" width={140} />
         <IconButton onClick={toggleDrawer}>
-          <ChevronLeftIcon />
+          <ChevronLeftIcon color="primary" />
         </IconButton>
       </Toolbar>
       <Divider />

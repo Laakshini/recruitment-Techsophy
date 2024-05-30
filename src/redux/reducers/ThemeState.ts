@@ -5,6 +5,8 @@ export interface ThemeData {
   primary: string;
   primaryLight: string;
   secondary: string;
+  secondaryLight: string;
+  background: string;
   error: string;
 }
 
@@ -15,9 +17,11 @@ export type ThemeEvent = {
 
 export const initialThemeState: ThemeData = {
   mode: "light",
-  primary: "#1B4F72",
+  primary: "#FFFFFF",
   primaryLight: "#000000DD",
-  secondary: "#000036",
+  secondary: "#071C50",
+  secondaryLight: "#F3F8FF",
+  background: "#E5EDF9",
   error: "#f17b7b",
 };
 

@@ -39,3 +39,7 @@ export const DASHBOARD_CHARTS_SERVICE_MANAGER_ENDPOINT =
   "/insurpro-backend/v1/dashboard/service-manager/performance?";
 
 export const GET_ALL_USERS = "/insurpro-backend/v1/all-users";
+
+export const USER_SIGN_IN = "/auth/sign_in";
+export const USER_REGISTER = "/auth/register";
+export const REFRESH_TOKEN = "/regenerateToken";

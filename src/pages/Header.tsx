@@ -16,11 +16,11 @@ import { useDispatch } from "react-redux";
 import { styled } from "@mui/material/styles";
 import UserLogo from "../assets/images/man.png";
 import SideNav from "./SideNav";
-import { useKeycloak } from "@react-keycloak/web";
 import useCustomStyles from "../hooks/CustomStylesHook";
 // import "../styles/Header.css";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useTheme } from "@emotion/react";
+import { TextField } from "@mui/material";
 
 // Styled AppBar component to control drawer state
 const AppBar = styled(MuiAppBar, {
@@ -46,7 +46,7 @@ const drawerWidth: number = 240;
 interface AppBarProps extends MuiAppBarProps {
   open?: boolean;
 }
-const styles=(theme:any)=>({
+const styles = (theme: any) => ({
   pageTitle: {
     textTransform: "capitalize",
   },
@@ -63,6 +63,7 @@ const styles=(theme:any)=>({
   headerTypography: {
     flexGrow: 1,
     textTransform: "capitalize",
+    color: theme.palette.secondary.main,
   },
   headerThemeButton: {
     color: theme.palette.common.white, // Use theme's palette for consistent colors
@@ -84,10 +85,10 @@ const styles=(theme:any)=>({
 
 function Header() {
   const themeDataState = useAppSelector((state) => state.UpdateTheme);
-  const theme= useTheme();
+  const theme = useTheme();
   const classes = useCustomStyles(styles, theme);
+  const navigate = useNavigate();
 
-  const { keycloak } = useKeycloak();
   const location = useLocation();
   const routeName = location.pathname.split("/").pop(); // Assuming the last part of the path is the route name
 
@@ -122,7 +123,8 @@ function Header() {
   };
 
   const handleAppLogout = () => {
-    keycloak.logout();
+    sessionStorage.clear();
+    navigate(`${process.env.PUBLIC_URL}/login`);
   };
 
   return (
@@ -131,10 +133,12 @@ function Header() {
         <Toolbar className={classes?.headerToolbar}>
           <IconButton
             edge="start"
-            color="inherit"
+            color="secondary"
             aria-label="open drawer"
             onClick={toggleDrawer}
-            className={`${classes?.headerIconButton} ${open ? classes?.hidden : ""}`}
+            className={`${classes?.headerIconButton} ${
+              open ? classes?.hidden : ""
+            }`}
           >
             <MenuIcon />
           </IconButton>
@@ -143,7 +147,7 @@ function Header() {
           <Typography
             component="h1"
             variant="h6"
-            color="inherit"
+            color="secondary"
             noWrap
             className={classes?.headerTypography}
           >
@@ -152,7 +156,7 @@ function Header() {
 
           {/* Theme toggle */}
           <Box>
-            <IconButton onClick={handleThemeChange}>
+            {/* <IconButton onClick={handleThemeChange}>
               {themeDataState?.mode === "light" ? (
                 <DarkModeOutlinedIcon
                   fontSize="small"
@@ -161,7 +165,7 @@ function Header() {
               ) : (
                 <DarkModeIcon fontSize="small" />
               )}
-            </IconButton>
+            </IconButton> */}
           </Box>
 
           {/* User menu */}
