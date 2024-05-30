@@ -1,4 +1,8 @@
-.App {
+*{
+  font-family: poppins !important;
+ }
+ 
+ .App {
   text-align: center;
 }
 

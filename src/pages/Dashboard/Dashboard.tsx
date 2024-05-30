@@ -1,28 +1,26 @@
-import React from "react";
-import useCustomStyles from "../../hooks/CustomStylesHook";
-import { useTheme } from "@emotion/react";
+import React, { useState } from "react";
 import StatusTable from "./StatusTable";
-import { Button, Grid, Typography } from "@mui/material";
+import { Button, Grid, Typography, Modal, Box } from "@mui/material";
 import StatusCard from "./StatusCards";
 import { statusCardData } from "../../data";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import Calender from "./Calender";
+import AddJobForm from "./AddJobForm";
+import useCustomStyles from "../../hooks/CustomStylesHook";
+import { useTheme } from "@emotion/react";
+
 const styles = (theme: any) => ({
   dashboardContainer: {
     display: "flex",
     flexDirection: "row",
     width: "100%",
     gap: "2%",
-    // justifyContent: "center",
-    // alignItems: "center",
-    // height: "100vh",
   },
   statusSection: {
     width: "78%",
     display: "flex",
     justifyContent: "space-between",
     flexDirection: "column",
-    // marginRight: "2rem",
   },
   text: {
     color: theme.palette.secondary.main,
@@ -59,10 +57,47 @@ const styles = (theme: any) => ({
     padding: "10px",
   },
   tableContainer: {},
+  modalStyle: {
+    position: 'absolute' as 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    bgcolor: 'background.paper',
+    boxShadow: 24,
+    p: 4,
+    maxHeight: "90%",
+    width: "40%",
+    overflowY: 'auto',
+    '&::-webkit-scrollbar': {
+      width: '0.4rem',
+    },
+    '&::-webkit-scrollbar-track': {
+      background: '#E5EDF9',
+      borderRadius: '10px', 
+
+    },
+    '&::-webkit-scrollbar-thumb': {
+      background: '#9eaabb', 
+      borderRadius: '10px', 
+    },
+    '&::-webkit-scrollbar-thumb:hover': {
+      background: '#92a1b4',
+    },
+  },
 });
+
 function Dashboard() {
   const theme = useTheme();
   const classes = useCustomStyles(styles, theme);
+  const [open, setOpen] = useState(false);
+
+  const handleOpen = () => setOpen(true);
+  const handleClose = (event: React.MouseEvent, reason: string) => {
+    if (reason !== "backdropClick") {
+      setOpen(false);
+    }
+  };
+
   return (
     <div className={classes?.dashboardContainer}>
       <div className={classes?.statusSection}>
@@ -83,6 +118,7 @@ function Dashboard() {
                 className={classes?.button}
                 size="small"
                 startIcon={<AddCircleOutlineIcon />}
+                onClick={handleOpen}
               >
                 Add Job
               </Button>
@@ -92,6 +128,7 @@ function Dashboard() {
           <div className={classes?.statusCardContainer}>
             {statusCardData.map((data) => (
               <StatusCard
+                key={data.description} // Ensure each item has a unique key
                 number={data.number}
                 description={data.description}
                 image={data.image}
@@ -105,10 +142,18 @@ function Dashboard() {
         </div>
       </div>
       <div className={classes?.calender}>{/* <Calender /> */}</div>
+      <Modal
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="job-form-modal"
+        aria-describedby="job-form-description"
+      >
+        <Box className={classes?.modalStyle}>
+          <AddJobForm handleClose={handleClose} />
+        </Box>
+      </Modal>
     </div>
   );
 }
 
 export default Dashboard;
-
-/* Control Flow: index -> App -> Wrapper -> Header -> SideNav -> NavListItems(Dashboard) -> Dashboard */
