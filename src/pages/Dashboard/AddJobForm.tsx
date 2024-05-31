@@ -158,7 +158,7 @@ const AddJobForm: React.FC<JobFormProps> = ({ formData, handleClose }) => {
     console.log("formState: ", formState);
   }, [formState]);
 
-  const handleSave = async () => {
+  const handleAdd = async () => {
     const form = { ...formState, jobId: uuidv4() };
     console.log("Form State:", formState);
     const response = await request.post(
@@ -166,6 +166,9 @@ const AddJobForm: React.FC<JobFormProps> = ({ formData, handleClose }) => {
       form
     );
     console.log(response);
+  };
+  const handleEdit = async () => {
+    //code to update job
   };
 
   const handleClear = (key: keyof typeof formState): void => {
@@ -189,7 +192,7 @@ const AddJobForm: React.FC<JobFormProps> = ({ formData, handleClose }) => {
     <Paper className={classes?.jobAddForm}>
       <Box className={classes?.rowFlex}>
         <Typography variant="h6" className={classes?.heading}>
-          Add Job
+          {formState.jobTitle === "" ? "Add Job" : "Edit Job"}
         </Typography>
         <IconButton onClick={(event) => handleClose(event, "closeButtonClick")}>
           <CloseIcon />
@@ -260,12 +263,12 @@ const AddJobForm: React.FC<JobFormProps> = ({ formData, handleClose }) => {
             type="date"
             fullWidth
             InputLabelProps={{ shrink: true }}
-            value={
-              formState.startDate
-                
-            }
+            value={formState.startDate}
             onChange={(e) =>
-              handleChange("startDate", new Date(e.target.value).toISOString().split("T")[0])
+              handleChange(
+                "startDate",
+                new Date(e.target.value).toISOString().split("T")[0]
+              )
             }
             className={classes?.textField}
           />
@@ -274,11 +277,13 @@ const AddJobForm: React.FC<JobFormProps> = ({ formData, handleClose }) => {
             type="date"
             fullWidth
             InputLabelProps={{ shrink: true }}
-            value={
-              formState.endDate
-                
+            value={formState.endDate}
+            onChange={(e) =>
+              handleChange(
+                "endDate",
+                new Date(e.target.value).toISOString().split("T")[0]
+              )
             }
-            onChange={(e) => handleChange("endDate", new Date(e.target.value).toISOString().split("T")[0])}
             className={classes?.textField}
           />
         </Box>
@@ -472,14 +477,25 @@ const AddJobForm: React.FC<JobFormProps> = ({ formData, handleClose }) => {
         </Box>
       </Box>
       <Box mt={2} display="flex" justifyContent="flex-end">
-        <Button
-          variant="contained"
-          color="primary"
-          className={classes?.saveButton}
-          onClick={handleSave}
-        >
-          Add Job
-        </Button>
+        {formState.jobTitle === "" ? (
+          <Button
+            variant="contained"
+            color="primary"
+            className={classes?.saveButton}
+            onClick={handleAdd}
+          >
+            Add Job
+          </Button>
+        ) : (
+          <Button
+            variant="contained"
+            color="primary"
+            className={classes?.saveButton}
+            onClick={handleEdit}
+          >
+            Edit Job
+          </Button>
+        )}
       </Box>
     </Paper>
   );

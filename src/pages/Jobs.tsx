@@ -234,22 +234,9 @@ const Jobs = () => {
     <div className={classes?.tableContainer}>
       <div style={{ width: "100%", height: 400 }}>
         <Dialog open={open} onClose={handleClose}>
-          <DialogTitle>Edit Job</DialogTitle>
           <DialogContent>
           <AddJobForm formData={formData} handleClose={handleClose} />
-            {/* <DialogContentText> */}
-            {/* {content} */}
-            {/* </DialogContentText> */}
           </DialogContent>
-          <DialogActions>
-            <Button
-              onClick={handleClose}
-              variant="contained"
-              sx={{ color: "#000000" }}
-            >
-              Submit
-            </Button>
-          </DialogActions>
         </Dialog>
         <TsDatagrid
           sx={{
