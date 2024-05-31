@@ -4,7 +4,7 @@ import {
   GridValueGetterParams,
   renderActionsCell,
 } from "@mui/x-data-grid";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import TsDatagrid from "../components/TsDatagrid";
 import { Button, IconButton } from "@mui/material";
 import useCustomStyles from "../hooks/CustomStylesHook";
@@ -52,6 +52,7 @@ const Jobs = () => {
   const classes = useCustomStyles(styles, theme);
   const [open, setOpen]= useState(false);
   const [content, setContent]= useState("");
+  const [data, setData]= useState([]);
   const handleEdit=(id:any)=>{
     setOpen(true);
     setContent(id);
@@ -68,8 +69,8 @@ const Jobs = () => {
           <img src={JobsIcons} className={classes?.logo} />
         </div>
         <div>
-          <div className={classes?.roleText}>{params?.row?.role}</div>
-          <div className={classes?.postedText}>{params?.row?.posted}</div>
+          <div className={classes?.roleText}>{params?.row?.jobTitle}</div>
+          <div className={classes?.postedText}>{params?.row?.created}</div>
         </div>
       </div>
     );
@@ -158,40 +159,41 @@ const Jobs = () => {
       renderCell: renderActions,
     }
   ];
-  const data=[
-    {
-      id: 1,
-      role: "Senior Data Analyst",
-      posted: "100 days ago",
-      openings: 2,
-      location: 'Hyderabad',
-      status: 'Active',
-      employmentType: 'Full Time',
-      roleCategory: 'Administ',
-      experience: 'Senior Level',
-      package: '10L',
-    },
-    {
-      id: 2,
-      role: "Senior Data Analyst",
-      posted: "100 days ago",
-      openings: 2,
-      location: 'Hyderabad',
-      status: 'Active',
-      employmentType: 'Full Time',
-      roleCategory: 'Administ',
-      experience: 'Senior Level',
-      package: '10L',
-    }
-  ];
+  // const data=[
+  //   {
+  //     id: 1,
+  //     role: "Senior Data Analyst",
+  //     posted: "100 days ago",
+  //     openings: 2,
+  //     location: 'Hyderabad',
+  //     status: 'Active',
+  //     employmentType: 'Full Time',
+  //     roleCategory: 'Administ',
+  //     experience: 'Senior Level',
+  //     package: '10L',
+  //   },
+  //   {
+  //     id: 2,
+  //     role: "Senior Data Analyst",
+  //     posted: "100 days ago",
+  //     openings: 2,
+  //     location: 'Hyderabad',
+  //     status: 'Active',
+  //     employmentType: 'Full Time',
+  //     roleCategory: 'Administ',
+  //     experience: 'Senior Level',
+  //     package: '10L',
+  //   }
+  // ];
   const getJobs=async()=>{
     const response:any= await request.get(`${process.env.REACT_APP_API_GATEWAY_URL}${GET_JOBS}`);
     console.log(response);
+    setData(response.data);
   }
-  useEffect(()=>{
+  useMemo(()=>{
     getJobs();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  })
+  },[])
 
 
   return (
@@ -217,6 +219,7 @@ const Jobs = () => {
           }}
           rows={data}
           columns={columns}
+          getRowId={(row:any) => row._id}
           // pageSize={10}
           // pageSizeArray={[10, 20, 30]}
           // getSelectedRowsData={() => {}}
