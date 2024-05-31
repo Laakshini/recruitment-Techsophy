@@ -124,40 +124,7 @@ const AddJobForm: React.FC<JobFormProps> = ({ formData, handleClose }) => {
   const theme = useTheme();
   const classes = useCustomStyles(styles, theme);
 
-  const [formState, setFormState] = useState({
-    employmentType: "",
-    jobTitle: "",
-    experience: "0",
-    location: [] as string[],
-    description: "",
-    department: "",
-    roleCategory: "",
-    aboutCompany: "",
-    clientName: "",
-    education: "",
-    keySkills: [] as string[],
-    startDate: null as Date | null,
-    endDate: null as Date | null,
-    status: "",
-    openings: 0,
-    package: "10L",
-    created: "",
-    __v: 0,
-    jobId: "",
-  });
-
-  useEffect(() => {
-    if (formData) {
-      // Update form state with the provided form data
-      setFormState(formData);
-      console.log("formData1: ", formData);
-    }
-  }, [formData]);
-
-  useEffect(() => {
-    console.log("formState: ", formState);
-  }, [formState]);
-
+  const [formState, setFormState] = useState(formData);
   const handleAdd = async () => {
     const form = { ...formState, jobId: uuidv4() };
     console.log("Form State:", formState);
@@ -192,7 +159,7 @@ const AddJobForm: React.FC<JobFormProps> = ({ formData, handleClose }) => {
     <Paper className={classes?.jobAddForm}>
       <Box className={classes?.rowFlex}>
         <Typography variant="h6" className={classes?.heading}>
-          {formState.jobTitle === "" ? "Add Job" : "Edit Job"}
+          Add Job
         </Typography>
         <IconButton onClick={(event) => handleClose(event, "closeButtonClick")}>
           <CloseIcon />
@@ -477,7 +444,6 @@ const AddJobForm: React.FC<JobFormProps> = ({ formData, handleClose }) => {
         </Box>
       </Box>
       <Box mt={2} display="flex" justifyContent="flex-end">
-        {formState.jobTitle === "" ? (
           <Button
             variant="contained"
             color="primary"
@@ -486,16 +452,7 @@ const AddJobForm: React.FC<JobFormProps> = ({ formData, handleClose }) => {
           >
             Add Job
           </Button>
-        ) : (
-          <Button
-            variant="contained"
-            color="primary"
-            className={classes?.saveButton}
-            onClick={handleEdit}
-          >
-            Edit Job
-          </Button>
-        )}
+        
       </Box>
     </Paper>
   );
