@@ -10,14 +10,38 @@ import { Button, IconButton } from "@mui/material";
 import useCustomStyles from "../hooks/CustomStylesHook";
 import { useTheme } from "@mui/material";
 import JobsIcons from "./../assets/icons/Group 2509.png";
-import EditIcon from '@mui/icons-material/Edit';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
+import EditIcon from "@mui/icons-material/Edit";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
 import { request } from "../services/Request";
 import { GET_JOBS } from "../constants/endpoints";
+import AddJobForm from "./Dashboard/AddJobForm";
+
+interface JobFormData {
+  jobId: string;
+  employmentType: string;
+  jobTitle: string;
+  experience: string;
+  location: string[];
+  package: string;
+  description: string;
+  department: string;
+  roleCategory: string;
+  aboutCompany: string;
+  clientName: string;
+  education: string;
+  keySkills: string[];
+  startDate: Date | null; 
+  endDate: Date | null; 
+  status: string;
+  created: string;
+  __v: number;
+  openings: number;
+}
+
 const styles = (theme: any) => ({
   tableContainer: {
     display: "flex",
@@ -50,17 +74,42 @@ const styles = (theme: any) => ({
 const Jobs = () => {
   const theme = useTheme();
   const classes = useCustomStyles(styles, theme);
-  const [open, setOpen]= useState(false);
-  const [content, setContent]= useState("");
-  const [data, setData]= useState([]);
-  const handleEdit=(id:any)=>{
-    setOpen(true);
-    setContent(id);
+  const [open, setOpen] = useState(false);
+  const [data, setData] = useState([]);
 
-  }
-  const handleClose=()=>{
+  const [formData, setFormData] = useState<JobFormData>({
+    employmentType: "",
+   jobTitle: "",
+   experience: "0",
+   location: [] as string[],
+   description: "",
+   department: "",
+   roleCategory: "",
+   aboutCompany: "",
+   clientName: "",
+   education: "",
+   keySkills: [] as string[],
+   startDate: null as Date | null,
+   endDate: null as Date | null,
+   status: "",
+   openings: 0,
+   package: '10L',
+   created: '',
+   __v: 0,
+   jobId: ''
+ });
+
+  const handleEdit = async (id: any) => {
+    const response: any = await request.get(
+      `${process.env.REACT_APP_API_GATEWAY_URL}${GET_JOBS}`
+    );
+    setFormData(response.data[0])
+    setOpen(true);
+    // setContent(id);
+  };
+  const handleClose = () => {
     setOpen(false);
-  }
+  };
 
   const renderRole = (params: any) => {
     return (
@@ -75,15 +124,25 @@ const Jobs = () => {
       </div>
     );
   };
-  const renderActions =(params:any)=>{
-    return(
-      <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+  const renderActions = (params: any) => {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
         <IconButton>
-          <EditIcon onClick={()=>{handleEdit(params.row.id)}}/>
+          <EditIcon
+            onClick={() => {
+              handleEdit(params.row.id);
+            }}
+          />
         </IconButton>
       </div>
-    )
-  }
+    );
+  };
 
   const columns: GridColDef[] = [
     {
@@ -157,57 +216,39 @@ const Jobs = () => {
       headerAlign: "center",
       align: "center",
       renderCell: renderActions,
-    }
+    },
   ];
-  // const data=[
-  //   {
-  //     id: 1,
-  //     role: "Senior Data Analyst",
-  //     posted: "100 days ago",
-  //     openings: 2,
-  //     location: 'Hyderabad',
-  //     status: 'Active',
-  //     employmentType: 'Full Time',
-  //     roleCategory: 'Administ',
-  //     experience: 'Senior Level',
-  //     package: '10L',
-  //   },
-  //   {
-  //     id: 2,
-  //     role: "Senior Data Analyst",
-  //     posted: "100 days ago",
-  //     openings: 2,
-  //     location: 'Hyderabad',
-  //     status: 'Active',
-  //     employmentType: 'Full Time',
-  //     roleCategory: 'Administ',
-  //     experience: 'Senior Level',
-  //     package: '10L',
-  //   }
-  // ];
-  const getJobs=async()=>{
-    const response:any= await request.get(`${process.env.REACT_APP_API_GATEWAY_URL}${GET_JOBS}`);
+
+  const getJobs = async () => {
+    const response: any = await request.get(
+      `${process.env.REACT_APP_API_GATEWAY_URL}${GET_JOBS}`
+    );
     console.log(response);
     setData(response.data);
-  }
-  useMemo(()=>{
+  };
+  useMemo(() => {
     getJobs();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  },[])
-
+  }, []);
 
   return (
     <div className={classes?.tableContainer}>
       <div style={{ width: "100%", height: 400 }}>
         <Dialog open={open} onClose={handleClose}>
-          <DialogTitle>Add Job</DialogTitle>
+          <DialogTitle>Edit Job</DialogTitle>
           <DialogContent>
-            <DialogContentText>
-              {content}
-            </DialogContentText>
+          <AddJobForm formData={formData} handleClose={handleClose} />
+            {/* <DialogContentText> */}
+            {/* {content} */}
+            {/* </DialogContentText> */}
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleClose} variant="contained" sx={{color: '#000000'}}>Submit</Button>
+            <Button
+              onClick={handleClose}
+              variant="contained"
+              sx={{ color: "#000000" }}
+            >
+              Submit
+            </Button>
           </DialogActions>
         </Dialog>
         <TsDatagrid
@@ -219,14 +260,7 @@ const Jobs = () => {
           }}
           rows={data}
           columns={columns}
-          getRowId={(row:any) => row._id}
-          // pageSize={10}
-          // pageSizeArray={[10, 20, 30]}
-          // getSelectedRowsData={() => {}}
-          // handlePageChange={() => {}}
-          // handlePageSizeChange={() => {}}
-          // isCheckboxSelection={false}
-          // totalElements={data?.length}
+          getRowId={(row: any) => row._id}
         />
       </div>
     </div>

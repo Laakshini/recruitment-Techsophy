@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Typography,
@@ -34,7 +34,30 @@ const cities = [
   "Surat",
 ];
 
+interface JobFormData {
+  jobId: string;
+  employmentType: string;
+  jobTitle: string;
+  experience: string;
+  location: string[];
+  package: string;
+  description: string;
+  department: string;
+  roleCategory: string;
+  aboutCompany: string;
+  clientName: string;
+  education: string;
+  keySkills: string[];
+  startDate: Date | null;
+  endDate: Date | null;
+  status: string;
+  created: string;
+  __v: number;
+  openings: number;
+}
+
 interface JobFormProps {
+  formData: JobFormData;
   handleClose: (event: React.MouseEvent, reason: string) => void;
 }
 
@@ -96,14 +119,15 @@ const styles = (theme: any) => ({
   },
 });
 
-const AddJobForm: React.FC<JobFormProps> = ({ handleClose }) => {
+const AddJobForm: React.FC<JobFormProps> = ({ formData, handleClose }) => {
+  console.log("AddJobForm", formData);
   const theme = useTheme();
   const classes = useCustomStyles(styles, theme);
 
   const [formState, setFormState] = useState({
     employmentType: "",
     jobTitle: "",
-    experience: 0,
+    experience: "0",
     location: [] as string[],
     description: "",
     department: "",
@@ -116,11 +140,26 @@ const AddJobForm: React.FC<JobFormProps> = ({ handleClose }) => {
     endDate: null as Date | null,
     status: "",
     openings: 0,
-    package: '10L'
+    package: "10L",
+    created: "",
+    __v: 0,
+    jobId: "",
   });
 
+  useEffect(() => {
+    if (formData) {
+      // Update form state with the provided form data
+      setFormState(formData);
+      console.log("formData1: ", formData);
+    }
+  }, [formData]);
+
+  useEffect(() => {
+    console.log("formState: ", formState);
+  }, [formState]);
+
   const handleSave = async () => {
-    const form= {...formState, jobId: uuidv4()}
+    const form = { ...formState, jobId: uuidv4() };
     console.log("Form State:", formState);
     const response = await request.post(
       `${process.env.REACT_APP_API_GATEWAY_URL}${ADD_JOBS}`,
@@ -223,11 +262,10 @@ const AddJobForm: React.FC<JobFormProps> = ({ handleClose }) => {
             InputLabelProps={{ shrink: true }}
             value={
               formState.startDate
-                ? formState.startDate.toISOString().split("T")[0]
-                : ""
+                
             }
             onChange={(e) =>
-              handleChange("startDate", new Date(e.target.value))
+              handleChange("startDate", new Date(e.target.value).toISOString().split("T")[0])
             }
             className={classes?.textField}
           />
@@ -238,10 +276,9 @@ const AddJobForm: React.FC<JobFormProps> = ({ handleClose }) => {
             InputLabelProps={{ shrink: true }}
             value={
               formState.endDate
-                ? formState.endDate.toISOString().split("T")[0]
-                : ""
+                
             }
-            onChange={(e) => handleChange("endDate", new Date(e.target.value))}
+            onChange={(e) => handleChange("endDate", new Date(e.target.value).toISOString().split("T")[0])}
             className={classes?.textField}
           />
         </Box>
@@ -449,5 +486,3 @@ const AddJobForm: React.FC<JobFormProps> = ({ handleClose }) => {
 };
 
 export default AddJobForm;
-
-

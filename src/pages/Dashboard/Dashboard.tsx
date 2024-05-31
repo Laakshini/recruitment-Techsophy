@@ -9,6 +9,28 @@ import AddJobForm from "./AddJobForm";
 import useCustomStyles from "../../hooks/CustomStylesHook";
 import { useTheme } from "@emotion/react";
 
+interface JobFormData {
+  jobId: string;
+  employmentType: string;
+  jobTitle: string;
+  experience: string;
+  location: string[];
+  package: string;
+  description: string;
+  department: string;
+  roleCategory: string;
+  aboutCompany: string;
+  clientName: string;
+  education: string;
+  keySkills: string[];
+  startDate: Date | null; 
+  endDate: Date | null; 
+  status: string;
+  created: string;
+  __v: number;
+  openings: number;
+}
+
 const styles = (theme: any) => ({
   dashboardContainer: {
     display: "flex",
@@ -58,38 +80,59 @@ const styles = (theme: any) => ({
   },
   tableContainer: {},
   modalStyle: {
-    position: 'absolute' as 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    bgcolor: 'background.paper',
+    position: "absolute" as "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    bgcolor: "background.paper",
     boxShadow: 24,
     p: 4,
     maxHeight: "90%",
     width: "40%",
-    overflowY: 'auto',
-    '&::-webkit-scrollbar': {
-      width: '0.4rem',
+    overflowY: "auto",
+    "&::-webkit-scrollbar": {
+      width: "0.4rem",
     },
-    '&::-webkit-scrollbar-track': {
-      background: '#E5EDF9',
-      borderRadius: '10px', 
-
+    "&::-webkit-scrollbar-track": {
+      background: "#E5EDF9",
+      borderRadius: "10px",
     },
-    '&::-webkit-scrollbar-thumb': {
-      background: '#9eaabb', 
-      borderRadius: '10px', 
+    "&::-webkit-scrollbar-thumb": {
+      background: "#9eaabb",
+      borderRadius: "10px",
     },
-    '&::-webkit-scrollbar-thumb:hover': {
-      background: '#92a1b4',
+    "&::-webkit-scrollbar-thumb:hover": {
+      background: "#92a1b4",
     },
   },
 });
 
 function Dashboard() {
+  const [formData, setFormData] = useState<JobFormData>({
+     employmentType: "",
+    jobTitle: "",
+    experience: "0",
+    location: [] as string[],
+    description: "",
+    department: "",
+    roleCategory: "",
+    aboutCompany: "",
+    clientName: "",
+    education: "",
+    keySkills: [] as string[],
+    startDate: null as Date | null,
+    endDate: null as Date | null,
+    status: "",
+    openings: 0,
+    package: '10L',
+    created: '',
+    __v: 0,
+    jobId: ''
+  });
   const theme = useTheme();
   const classes = useCustomStyles(styles, theme);
   const [open, setOpen] = useState(false);
+  const [content, setContent] = useState("");
 
   const handleOpen = () => setOpen(true);
   const handleClose = (event: React.MouseEvent, reason: string) => {
@@ -149,7 +192,7 @@ function Dashboard() {
         aria-describedby="job-form-description"
       >
         <Box className={classes?.modalStyle}>
-          <AddJobForm handleClose={handleClose} />
+          <AddJobForm formData={formData} handleClose={handleClose} />
         </Box>
       </Modal>
     </div>
