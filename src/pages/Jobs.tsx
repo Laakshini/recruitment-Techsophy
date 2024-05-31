@@ -19,29 +19,11 @@ import DialogTitle from "@mui/material/DialogTitle";
 import { request } from "../services/Request";
 import { GET_JOBS, GET_JOB_BY_ID } from "../constants/endpoints";
 import AddJobForm from "./Dashboard/AddJobForm";
+import ReactLoading from 'react-loading';
+import { getAllJobs, getJobById } from "../services/JobService";
+import zIndex from "@mui/material/styles/zIndex";
  
-// interface JobFormData {
-//   jobId: string;
-//   employmentType: string;
-//   jobTitle: string;
-//   experience: string;
-//   location: string[];
-//   package: string;
-//   description: string;
-//   department: string;
-//   roleCategory: string;
-//   aboutCompany: string;
-//   clientName: string;
-//   education: string;
-//   keySkills: string[];
-//   startDate: Date | null;
-//   endDate: Date | null;
-//   status: string;
-//   created: string;
-//   __v: number;
-//   openings: number;
-// }
- 
+
 const styles = (theme: any) => ({
   tableContainer: {
     display: "flex",
@@ -95,6 +77,20 @@ const styles = (theme: any) => ({
       background: "#92a1b4",
     },
   },
+  loader: {
+    color: theme.palette.secondary.main,
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+  },
+  formLoader:{
+    textAlign: "center",
+    position: "relative",
+    top: "50%",
+    left: "50%",
+    zIndex: 99,
+  }
+  
 });
  
 const Jobs = () => {
@@ -102,14 +98,11 @@ const Jobs = () => {
   const classes = useCustomStyles(styles, theme);
   const [open, setOpen] = useState(false);
   const [data, setData] = useState([]);
- 
   const [formData, setFormData] = useState();
   const handleEdit = async (id: any) => {
-    const response: any = await request.get(
-      `${process.env.REACT_APP_API_GATEWAY_URL}${GET_JOB_BY_ID}?jobId=${id}`
-    );
-    setFormData(response.data);
     setOpen(true);
+    const response: any = await getJobById(id);
+    setFormData(response.data);
     // setContent(id);
   };
   const handleClose = () => {
@@ -236,13 +229,10 @@ const Jobs = () => {
   ];
  
   const getJobs = async () => {
-    const response: any = await request.get(
-      `${process.env.REACT_APP_API_GATEWAY_URL}${GET_JOBS}`
-    );
-    console.log(response);
+    const response= await getAllJobs();
     setData(response.data);
   };
-  useMemo(() => {
+  useEffect(() => {
     getJobs();
   }, []);
  
@@ -256,10 +246,17 @@ const Jobs = () => {
         aria-describedby="job-form-description"
       >
         <Box className={classes?.modalStyle}>
+          {
+          formData?
           <AddJobForm formData={formData} handleClose={handleClose} dialogAction={"Edit"}/>
+          :
+          <ReactLoading type="spin" color="#071C50" height={50} width={50} className={classes?.formLoader}/>
+          }
         </Box>
       </Modal>
-        <TsDatagrid
+      {
+      data?
+      <TsDatagrid
           sx={{
             "& .MuiDataGrid-columnSeparator": { display: "none" },
             "& .MuiDataGrid-columnHeader--moving": {
@@ -270,6 +267,10 @@ const Jobs = () => {
           columns={columns}
           getRowId={(row: any) => row._id}
         />
+        :
+        <ReactLoading type="spin" color="#071C50" height={50} width={50} className={classes?.loader}/>
+      }
+        
       </div>
     </div>
   );

@@ -21,6 +21,7 @@ import { request } from "../../services/Request";
 import { ADD_JOBS } from "../../constants/endpoints";
 import { v4 as uuidv4 } from "uuid";
 import { useDispatch } from "react-redux";
+import { createJob } from "../../services/JobService";
 
 const cities = [
   "Delhi",
@@ -107,10 +108,7 @@ const AddJobForm: React.FC<JobFormProps> = ({ formData, handleClose, dialogActio
   const handleAdd = async () => {
     const form = { ...formState, jobId: uuidv4() };
     console.log("Form State:", formState);
-    const response:any = await request.post(
-      `${process.env.REACT_APP_API_GATEWAY_URL}${ADD_JOBS}`,
-      form
-    );
+    const response:any = await createJob(form);
     console.log(response);
     handleClose();
     dispatch({
