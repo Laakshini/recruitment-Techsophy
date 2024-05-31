@@ -12,7 +12,6 @@ import {
   FormControl,
   InputLabel,
   InputAdornment,
-  FormHelperText,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import useCustomStyles from "../../hooks/CustomStylesHook";
@@ -36,27 +35,6 @@ const cities = [
   "Surat",
 ];
 
-// interface JobFormData {
-//   jobId: string;
-//   employmentType: string;
-//   jobTitle: string;
-//   experience: string;
-//   location: string[];
-//   package: string;
-//   description: string;
-//   department: string;
-//   roleCategory: string;
-//   aboutCompany: string;
-//   clientName: string;
-//   education: string;
-//   keySkills: string[];
-//   startDate: Date | null;
-//   endDate: Date | null;
-//   status: string;
-//   __v: number;
-//   openings: number;
-// }
-
 interface JobFormProps {
   formData: any;
   handleClose: () => void;
@@ -76,7 +54,7 @@ const styles = (theme: any) => ({
     marginTop: "1.5rem",
     display: "flex",
     flexDirection: "column",
-    gap: "2rem",
+    gap: "0.5rem",
   },
   rowFlex: {
     display: "flex",
@@ -102,27 +80,25 @@ const styles = (theme: any) => ({
     marginBottom: theme.spacing(2),
     "& .MuiInputLabel-root": {
       color: "#969696",
+      fontSize: "0.8rem",
+
     },
     "& .MuiOutlinedInput-root": {
+      fontSize: "0.8rem",
+
       "&.Mui-focused fieldset": {
         borderColor: "#4B93E7",
       },
       "& input": {
         color: "#000",
+        fontSize: "0.8rem",
+
       },
     },
-  },
-  errorTextField: {
-    borderColor: "red",
-  },
-  errorMessage: {
-    color: "red",
-    fontSize: "0.875rem",
   },
 });
 
 const AddJobForm: React.FC<JobFormProps> = ({ formData, handleClose, dialogAction }) => {
-  // console.log("AddJobForm", formData);
   const theme = useTheme();
   const classes = useCustomStyles(styles, theme);
   const dispatch = useDispatch();
