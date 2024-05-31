@@ -6,7 +6,7 @@ import {
 } from "@mui/x-data-grid";
 import React, { useEffect, useMemo, useState } from "react";
 import TsDatagrid from "../components/TsDatagrid";
-import { Button, IconButton } from "@mui/material";
+import { Box, Button, IconButton, Modal } from "@mui/material";
 import useCustomStyles from "../hooks/CustomStylesHook";
 import { useTheme } from "@mui/material";
 import JobsIcons from "./../assets/icons/Group 2509.png";
@@ -17,31 +17,31 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import { request } from "../services/Request";
-import { GET_JOBS } from "../constants/endpoints";
+import { GET_JOBS, GET_JOB_BY_ID } from "../constants/endpoints";
 import AddJobForm from "./Dashboard/AddJobForm";
-
-interface JobFormData {
-  jobId: string;
-  employmentType: string;
-  jobTitle: string;
-  experience: string;
-  location: string[];
-  package: string;
-  description: string;
-  department: string;
-  roleCategory: string;
-  aboutCompany: string;
-  clientName: string;
-  education: string;
-  keySkills: string[];
-  startDate: Date | null; 
-  endDate: Date | null; 
-  status: string;
-  created: string;
-  __v: number;
-  openings: number;
-}
-
+ 
+// interface JobFormData {
+//   jobId: string;
+//   employmentType: string;
+//   jobTitle: string;
+//   experience: string;
+//   location: string[];
+//   package: string;
+//   description: string;
+//   department: string;
+//   roleCategory: string;
+//   aboutCompany: string;
+//   clientName: string;
+//   education: string;
+//   keySkills: string[];
+//   startDate: Date | null;
+//   endDate: Date | null;
+//   status: string;
+//   created: string;
+//   __v: number;
+//   openings: number;
+// }
+ 
 const styles = (theme: any) => ({
   tableContainer: {
     display: "flex",
@@ -69,49 +69,65 @@ const styles = (theme: any) => ({
     color: theme.palette.secondary.main,
     opacity: "50%",
   },
+  modalStyle: {
+    position: "absolute" as "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    bgcolor: "background.paper",
+    boxShadow: 24,
+    p: 4,
+    maxHeight: "90%",
+    width: "40%",
+    overflowY: "auto",
+    "&::-webkit-scrollbar": {
+      width: "0.4rem",
+    },
+    "&::-webkit-scrollbar-track": {
+      background: "#E5EDF9",
+      borderRadius: "10px",
+    },
+    "&::-webkit-scrollbar-thumb": {
+      background: "#9eaabb",
+      borderRadius: "10px",
+    },
+    "&::-webkit-scrollbar-thumb:hover": {
+      background: "#92a1b4",
+    },
+  },
 });
-
+ 
 const Jobs = () => {
   const theme = useTheme();
   const classes = useCustomStyles(styles, theme);
   const [open, setOpen] = useState(false);
   const [data, setData] = useState([]);
-
-  const [formData, setFormData] = useState<JobFormData>({
-    employmentType: "",
-   jobTitle: "",
-   experience: "0",
-   location: [] as string[],
-   description: "",
-   department: "",
-   roleCategory: "",
-   aboutCompany: "",
-   clientName: "",
-   education: "",
-   keySkills: [] as string[],
-   startDate: null as Date | null,
-   endDate: null as Date | null,
-   status: "",
-   openings: 0,
-   package: '10L',
-   created: '',
-   __v: 0,
-   jobId: ''
- });
-
+ 
+  const [formData, setFormData] = useState();
   const handleEdit = async (id: any) => {
     const response: any = await request.get(
-      `${process.env.REACT_APP_API_GATEWAY_URL}${GET_JOBS}`
+      `${process.env.REACT_APP_API_GATEWAY_URL}${GET_JOB_BY_ID}?jobId=${id}`
     );
-    setFormData(response.data[0])
+    setFormData(response.data);
     setOpen(true);
     // setContent(id);
   };
   const handleClose = () => {
     setOpen(false);
   };
-
+  const daysAgo = (uploadDate: any) => {
+  const upload: any = new Date(uploadDate);
+  const today: any = new Date();
+  const diffTime = today - upload;
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+  if (diffDays===0){
+    return "Today"
+  }
+  return `${diffDays} days ago`;
+};
+ 
   const renderRole = (params: any) => {
+    const posted = daysAgo(params?.row?.created)
     return (
       <div className={classes?.roleContainer}>
         <div>
@@ -119,7 +135,7 @@ const Jobs = () => {
         </div>
         <div>
           <div className={classes?.roleText}>{params?.row?.jobTitle}</div>
-          <div className={classes?.postedText}>{params?.row?.created}</div>
+          <div className={classes?.postedText}>{posted}</div>
         </div>
       </div>
     );
@@ -136,14 +152,14 @@ const Jobs = () => {
         <IconButton>
           <EditIcon
             onClick={() => {
-              handleEdit(params.row.id);
+              handleEdit(params.row.jobId);
             }}
           />
         </IconButton>
       </div>
     );
   };
-
+ 
   const columns: GridColDef[] = [
     {
       field: "",
@@ -218,7 +234,7 @@ const Jobs = () => {
       renderCell: renderActions,
     },
   ];
-
+ 
   const getJobs = async () => {
     const response: any = await request.get(
       `${process.env.REACT_APP_API_GATEWAY_URL}${GET_JOBS}`
@@ -229,15 +245,20 @@ const Jobs = () => {
   useMemo(() => {
     getJobs();
   }, []);
-
+ 
   return (
     <div className={classes?.tableContainer}>
       <div style={{ width: "100%", height: 400 }}>
-        <Dialog open={open} onClose={handleClose}>
-          <DialogContent>
-          <AddJobForm formData={formData} handleClose={handleClose} />
-          </DialogContent>
-        </Dialog>
+      <Modal
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="job-form-modal"
+        aria-describedby="job-form-description"
+      >
+        <Box className={classes?.modalStyle}>
+          <AddJobForm formData={formData} handleClose={handleClose} dialogAction={"Edit"}/>
+        </Box>
+      </Modal>
         <TsDatagrid
           sx={{
             "& .MuiDataGrid-columnSeparator": { display: "none" },
@@ -253,5 +274,5 @@ const Jobs = () => {
     </div>
   );
 };
-
+ 
 export default Jobs;

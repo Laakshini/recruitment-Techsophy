@@ -26,7 +26,6 @@ interface JobFormData {
   startDate: Date | null; 
   endDate: Date | null; 
   status: string;
-  created: string;
   __v: number;
   openings: number;
 }
@@ -125,7 +124,6 @@ function Dashboard() {
     status: "",
     openings: 0,
     package: '10L',
-    created: '',
     __v: 0,
     jobId: ''
   });
@@ -135,11 +133,9 @@ function Dashboard() {
   const [content, setContent] = useState("");
 
   const handleOpen = () => setOpen(true);
-  const handleClose = (event: React.MouseEvent, reason: string) => {
-    if (reason !== "backdropClick") {
-      setOpen(false);
-    }
-  };
+  const handleClose = ()=>{
+    setOpen(false);     
+  }
 
   return (
     <div className={classes?.dashboardContainer}>
@@ -191,8 +187,9 @@ function Dashboard() {
         aria-labelledby="job-form-modal"
         aria-describedby="job-form-description"
       >
+        
         <Box className={classes?.modalStyle}>
-          <AddJobForm formData={formData} handleClose={handleClose} />
+          <AddJobForm formData={formData} handleClose={handleClose} dialogAction={"Add"}/>
         </Box>
       </Modal>
     </div>

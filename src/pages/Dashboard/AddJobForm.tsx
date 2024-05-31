@@ -21,6 +21,8 @@ import { Clear } from "@mui/icons-material";
 import { request } from "../../services/Request";
 import { ADD_JOBS } from "../../constants/endpoints";
 import { v4 as uuidv4 } from "uuid";
+import { useDispatch } from "react-redux";
+
 const cities = [
   "Delhi",
   "Mumbai",
@@ -34,31 +36,31 @@ const cities = [
   "Surat",
 ];
 
-interface JobFormData {
-  jobId: string;
-  employmentType: string;
-  jobTitle: string;
-  experience: string;
-  location: string[];
-  package: string;
-  description: string;
-  department: string;
-  roleCategory: string;
-  aboutCompany: string;
-  clientName: string;
-  education: string;
-  keySkills: string[];
-  startDate: Date | null;
-  endDate: Date | null;
-  status: string;
-  created: string;
-  __v: number;
-  openings: number;
-}
+// interface JobFormData {
+//   jobId: string;
+//   employmentType: string;
+//   jobTitle: string;
+//   experience: string;
+//   location: string[];
+//   package: string;
+//   description: string;
+//   department: string;
+//   roleCategory: string;
+//   aboutCompany: string;
+//   clientName: string;
+//   education: string;
+//   keySkills: string[];
+//   startDate: Date | null;
+//   endDate: Date | null;
+//   status: string;
+//   __v: number;
+//   openings: number;
+// }
 
 interface JobFormProps {
-  formData: JobFormData;
-  handleClose: (event: React.MouseEvent, reason: string) => void;
+  formData: any;
+  handleClose: () => void;
+  dialogAction: any;
 }
 
 const styles = (theme: any) => ({
@@ -83,8 +85,8 @@ const styles = (theme: any) => ({
     gap: "1rem",
   },
   saveButton: {
-    backgroundColor: "green",
-    "&:hover": { backgroundColor: "darkgreen" },
+    backgroundColor: theme.palette.secondary.main,
+    // "&:hover": { backgroundColor:  },
   },
   closeButton: {
     marginRight: "1.5rem",
@@ -119,27 +121,38 @@ const styles = (theme: any) => ({
   },
 });
 
-const AddJobForm: React.FC<JobFormProps> = ({ formData, handleClose }) => {
-  console.log("AddJobForm", formData);
+const AddJobForm: React.FC<JobFormProps> = ({ formData, handleClose, dialogAction }) => {
+  // console.log("AddJobForm", formData);
   const theme = useTheme();
   const classes = useCustomStyles(styles, theme);
+  const dispatch = useDispatch();
 
   const [formState, setFormState] = useState(formData);
   const handleAdd = async () => {
     const form = { ...formState, jobId: uuidv4() };
     console.log("Form State:", formState);
-    const response = await request.post(
+    const response:any = await request.post(
       `${process.env.REACT_APP_API_GATEWAY_URL}${ADD_JOBS}`,
       form
     );
     console.log(response);
+    handleClose();
+    dispatch({
+      type: "SEND_ALERT",
+      data: {
+        enable: true,
+        type: "success",
+        message: response?.message,
+        duration: 5000,
+      },
+    });
   };
   const handleEdit = async () => {
     //code to update job
   };
 
   const handleClear = (key: keyof typeof formState): void => {
-    setFormState((prevState) => ({
+    setFormState((prevState:any) => ({
       ...prevState,
       [key]: Array.isArray(prevState[key]) ? [] : "",
     }));
@@ -149,19 +162,19 @@ const AddJobForm: React.FC<JobFormProps> = ({ formData, handleClose }) => {
     key: keyof typeof formState,
     value: string | number | Date | null | string[]
   ): void => {
-    setFormState((prevState) => ({
+    setFormState((prevState:any) => ({
       ...prevState,
       [key]: value,
     }));
   };
 
   return (
-    <Paper className={classes?.jobAddForm}>
+    <Box className={classes?.jobAddForm}>
       <Box className={classes?.rowFlex}>
         <Typography variant="h6" className={classes?.heading}>
-          Add Job
+          {dialogAction} Job
         </Typography>
-        <IconButton onClick={(event) => handleClose(event, "closeButtonClick")}>
+        <IconButton onClick={(event) => handleClose()}>
           <CloseIcon />
         </IconButton>
       </Box>
@@ -450,11 +463,11 @@ const AddJobForm: React.FC<JobFormProps> = ({ formData, handleClose }) => {
             className={classes?.saveButton}
             onClick={handleAdd}
           >
-            Add Job
+            {dialogAction} Job
           </Button>
         
       </Box>
-    </Paper>
+    </Box>
   );
 };
 

@@ -46,3 +46,4 @@ export const REFRESH_TOKEN = "/regenerateToken";
 
 export const GET_JOBS= "/getAllJobs";
 export const ADD_JOBS = "/createJob";
+export const GET_JOB_BY_ID = "/getJob";
