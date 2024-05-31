@@ -192,7 +192,7 @@ const AddJobForm: React.FC<JobFormProps> = ({ formData, handleClose }) => {
     <Paper className={classes?.jobAddForm}>
       <Box className={classes?.rowFlex}>
         <Typography variant="h6" className={classes?.heading}>
-          {formState.jobTitle === "" ? "Add Job" : "Edit Job"}
+          Add Job
         </Typography>
         <IconButton onClick={(event) => handleClose(event, "closeButtonClick")}>
           <CloseIcon />
@@ -477,25 +477,14 @@ const AddJobForm: React.FC<JobFormProps> = ({ formData, handleClose }) => {
         </Box>
       </Box>
       <Box mt={2} display="flex" justifyContent="flex-end">
-        {formState.jobTitle === "" ? (
-          <Button
-            variant="contained"
-            color="primary"
-            className={classes?.saveButton}
-            onClick={handleAdd}
-          >
-            Add Job
-          </Button>
-        ) : (
-          <Button
-            variant="contained"
-            color="primary"
-            className={classes?.saveButton}
-            onClick={handleEdit}
-          >
-            Edit Job
-          </Button>
-        )}
+        <Button
+          variant="contained"
+          color="primary"
+          className={classes?.saveButton}
+          onClick={handleAdd}
+        >
+          Add Job
+        </Button>
       </Box>
     </Paper>
   );
