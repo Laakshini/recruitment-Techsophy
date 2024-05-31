@@ -12,6 +12,7 @@ import {
   FormControl,
   InputLabel,
   InputAdornment,
+  FormHelperText,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import useCustomStyles from "../../hooks/CustomStylesHook";
@@ -62,7 +63,7 @@ const styles = (theme: any) => ({
     "&:hover": { backgroundColor: "darkgreen" },
   },
   closeButton: {
-    marginRight: "16px",
+    marginRight: "1.5rem",
   },
   textArea: {
     resize: "none",
@@ -72,6 +73,7 @@ const styles = (theme: any) => ({
     borderRadius: "4px",
   },
   textField: {
+    marginBottom: theme.spacing(2),
     "& .MuiInputLabel-root": {
       color: "#969696",
     },
@@ -83,6 +85,13 @@ const styles = (theme: any) => ({
         color: "#000",
       },
     },
+  },
+  errorTextField: {
+    borderColor: "red",
+  },
+  errorMessage: {
+    color: "red",
+    fontSize: "0.875rem",
   },
 });
 
@@ -108,11 +117,13 @@ const AddJobForm: React.FC<JobFormProps> = ({ handleClose }) => {
     openings: 0,
   });
 
-  const handleSave = async() => {
+  const handleSave = async () => {
     console.log("Form State:", formState);
-    const response = await request.post(`${process.env.REACT_APP_API_GATEWAY_URL}${ADD_JOBS}`,formState);
+    const response = await request.post(
+      `${process.env.REACT_APP_API_GATEWAY_URL}${ADD_JOBS}`,
+      formState
+    );
     console.log(response);
-
   };
 
   const handleClear = (key: keyof typeof formState): void => {
@@ -144,19 +155,31 @@ const AddJobForm: React.FC<JobFormProps> = ({ handleClose }) => {
       </Box>
 
       <Box className={classes?.formFields}>
-        <TextField
-          label="Job Title"
-          fullWidth
-          value={formState.jobTitle}
-          onChange={(e) => handleChange("jobTitle", e.target.value)}
-          className={classes?.textField}
-        />
+        <Box className={classes?.rowFlex}>
+          <TextField
+            label="Job Title"
+            fullWidth
+            value={formState.jobTitle}
+            onChange={(e) => handleChange("jobTitle", e.target.value)}
+            className={classes?.textField}
+          />
+          <TextField
+            type="number"
+            label="Openings"
+            fullWidth
+            value={formState.openings}
+            onChange={(e) => handleChange("openings", parseInt(e.target.value))}
+            className={classes?.textField}
+          />
+        </Box>
         <Box className={classes?.rowFlex}>
           <FormControl fullWidth className={classes?.textField}>
-            <InputLabel>Employee Type</InputLabel>
+            <InputLabel id="employee-type-label">Employee Type</InputLabel>
             <Select
+              labelId="employee-type-label"
               value={formState.employmentType}
               onChange={(e) => handleChange("employmentType", e.target.value)}
+              label="Employee Type"
               endAdornment={
                 formState.employmentType && (
                   <InputAdornment
@@ -195,8 +218,14 @@ const AddJobForm: React.FC<JobFormProps> = ({ handleClose }) => {
             type="date"
             fullWidth
             InputLabelProps={{ shrink: true }}
-            value={formState.startDate ? formState.startDate.toISOString().split("T")[0] : ""}
-            onChange={(e) => handleChange("startDate", new Date(e.target.value))}
+            value={
+              formState.startDate
+                ? formState.startDate.toISOString().split("T")[0]
+                : ""
+            }
+            onChange={(e) =>
+              handleChange("startDate", new Date(e.target.value))
+            }
             className={classes?.textField}
           />
           <TextField
@@ -204,38 +233,57 @@ const AddJobForm: React.FC<JobFormProps> = ({ handleClose }) => {
             type="date"
             fullWidth
             InputLabelProps={{ shrink: true }}
-            value={formState.endDate ? formState.endDate.toISOString().split("T")[0] : ""}
+            value={
+              formState.endDate
+                ? formState.endDate.toISOString().split("T")[0]
+                : ""
+            }
             onChange={(e) => handleChange("endDate", new Date(e.target.value))}
             className={classes?.textField}
           />
         </Box>
-
-        <FormControl fullWidth className={classes?.textField}>
-          <InputLabel>Location</InputLabel>
-          <Select
-            multiple
-            value={formState.location}
-            onChange={(e) => handleChange("location", e.target.value as string[])}
-            endAdornment={
-              formState.location.length > 0 && (
-                <InputAdornment position="end" className={classes?.closeButton}>
-                  <IconButton
-                    onClick={() => handleClear("location")}
-                    edge="end"
+        <Box className={classes?.rowFlex}>
+          <FormControl fullWidth className={classes?.textField}>
+            <InputLabel id="location-label">Location</InputLabel>
+            <Select
+              labelId="location-label"
+              multiple
+              value={formState.location}
+              onChange={(e) =>
+                handleChange("location", e.target.value as string[])
+              }
+              label="Location"
+              endAdornment={
+                formState.location.length > 0 && (
+                  <InputAdornment
+                    position="end"
+                    className={classes?.closeButton}
                   >
-                    <Clear />
-                  </IconButton>
-                </InputAdornment>
-              )
-            }
-          >
-            {cities.map((city) => (
-              <MenuItem key={city} value={city}>
-                {city}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+                    <IconButton
+                      onClick={() => handleClear("location")}
+                      edge="end"
+                    >
+                      <Clear />
+                    </IconButton>
+                  </InputAdornment>
+                )
+              }
+            >
+              {cities.map((city) => (
+                <MenuItem key={city} value={city}>
+                  {city}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <TextField
+            label="Client Name"
+            fullWidth
+            value={formState.clientName}
+            onChange={(e) => handleChange("clientName", e.target.value)}
+            className={classes?.textField}
+          />
+        </Box>
         <TextareaAutosize
           minRows={2}
           placeholder="Job Description"
@@ -243,53 +291,68 @@ const AddJobForm: React.FC<JobFormProps> = ({ handleClose }) => {
           onChange={(e) => handleChange("description", e.target.value)}
           className={`${classes?.textArea} ${classes?.textField}`}
         />
-
-        <FormControl fullWidth className={classes?.textField}>
-          <InputLabel>Department</InputLabel>
-          <Select
-            value={formState.department}
-            onChange={(e) => handleChange("department", e.target.value as string)}
-            endAdornment={
-              formState.department && (
-                <InputAdornment position="end" className={classes?.closeButton}>
-                  <IconButton
-                    onClick={() => handleClear("department")}
-                    edge="end"
+        <Box className={classes?.rowFlex}>
+          <FormControl fullWidth className={classes?.textField}>
+            <InputLabel id="department-type-label">Department</InputLabel>
+            <Select
+              labelId="department-type-label"
+              value={formState.department}
+              onChange={(e) =>
+                handleChange("department", e.target.value as string)
+              }
+              label="Department"
+              endAdornment={
+                formState.department && (
+                  <InputAdornment
+                    position="end"
+                    className={classes?.closeButton}
                   >
-                    <Clear />
-                  </IconButton>
-                </InputAdornment>
-              )
-            }
-          >
-            <MenuItem value="IT">IT</MenuItem>
-            <MenuItem value="Marketing">Marketing</MenuItem>
-            <MenuItem value="Business">Business</MenuItem>
-          </Select>
-        </FormControl>
-        <FormControl fullWidth className={classes?.textField}>
-          <InputLabel>Role Category</InputLabel>
-          <Select
-            value={formState.roleCategory}
-            onChange={(e) => handleChange("roleCategory", e.target.value as string)}
-            endAdornment={
-              formState.roleCategory && (
-                <InputAdornment position="end" className={classes?.closeButton}>
-                  <IconButton
-                    onClick={() => handleClear("roleCategory")}
-                    edge="end"
+                    <IconButton
+                      onClick={() => handleClear("department")}
+                      edge="end"
+                    >
+                      <Clear />
+                    </IconButton>
+                  </InputAdornment>
+                )
+              }
+            >
+              <MenuItem value="IT">IT</MenuItem>
+              <MenuItem value="Marketing">Marketing</MenuItem>
+              <MenuItem value="Business">Business</MenuItem>
+            </Select>
+          </FormControl>
+          <FormControl fullWidth className={classes?.textField}>
+            <InputLabel id="role-category-label">Role Category</InputLabel>
+            <Select
+              labelId="role-category-label"
+              value={formState.roleCategory}
+              onChange={(e) =>
+                handleChange("roleCategory", e.target.value as string)
+              }
+              label="Role Category"
+              endAdornment={
+                formState.roleCategory && (
+                  <InputAdornment
+                    position="end"
+                    className={classes?.closeButton}
                   >
-                    <Clear />
-                  </IconButton>
-                </InputAdornment>
-              )
-            }
-          >
-            <MenuItem value="IT">IT</MenuItem>
-            <MenuItem value="Marketing">Marketing</MenuItem>
-            <MenuItem value="Business">Business</MenuItem>
-          </Select>
-        </FormControl>
+                    <IconButton
+                      onClick={() => handleClear("roleCategory")}
+                      edge="end"
+                    >
+                      <Clear />
+                    </IconButton>
+                  </InputAdornment>
+                )
+              }
+            >
+              <MenuItem value="IT">IT</MenuItem>
+              <MenuItem value="Marketing">Marketing</MenuItem>
+              <MenuItem value="Business">Business</MenuItem>
+            </Select>
+          </FormControl>
+        </Box>
         <TextareaAutosize
           minRows={2}
           placeholder="About Company"
@@ -297,13 +360,7 @@ const AddJobForm: React.FC<JobFormProps> = ({ handleClose }) => {
           onChange={(e) => handleChange("aboutCompany", e.target.value)}
           className={`${classes?.textArea} ${classes?.textField}`}
         />
-        <TextField
-          label="Client Name"
-          fullWidth
-          value={formState.clientName}
-          onChange={(e) => handleChange("clientName", e.target.value)}
-          className={classes?.textField}
-        />
+
         <TextField
           label="Education"
           fullWidth
@@ -311,62 +368,68 @@ const AddJobForm: React.FC<JobFormProps> = ({ handleClose }) => {
           onChange={(e) => handleChange("education", e.target.value)}
           className={classes?.textField}
         />
-        <FormControl fullWidth className={classes?.textField}>
-          <InputLabel>Key Skills</InputLabel>
-          <Select
-            multiple
-            value={formState.keySkills}
-            onChange={(e) => handleChange("keySkills", e.target.value as string[])}
-            endAdornment={
-              formState.keySkills.length > 0 && (
-                <InputAdornment position="end" className={classes?.closeButton}>
-                  <IconButton
-                    onClick={() => handleClear("keySkills")}
-                    edge="end"
+        <Box className={classes?.rowFlex}>
+          <FormControl fullWidth className={classes?.textField}>
+            <InputLabel id="key-skills-label">Key Skills</InputLabel>
+            <Select
+              labelId="key-skills-label"
+              multiple
+              value={formState.keySkills}
+              onChange={(e) =>
+                handleChange("keySkills", e.target.value as string[])
+              }
+              label="Key Skills"
+              endAdornment={
+                formState.keySkills.length > 0 && (
+                  <InputAdornment
+                    position="end"
+                    className={classes?.closeButton}
                   >
-                    <Clear />
-                  </IconButton>
-                </InputAdornment>
-              )
-            }
-          >
-            <MenuItem value="HTML">HTML</MenuItem>
-            <MenuItem value="CSS">CSS</MenuItem>
-            <MenuItem value="JavaScript">JavaScript</MenuItem>
-            <MenuItem value="React">React</MenuItem>
-          </Select>
-        </FormControl>
+                    <IconButton
+                      onClick={() => handleClear("keySkills")}
+                      edge="end"
+                    >
+                      <Clear />
+                    </IconButton>
+                  </InputAdornment>
+                )
+              }
+            >
+              <MenuItem value="HTML">HTML</MenuItem>
+              <MenuItem value="CSS">CSS</MenuItem>
+              <MenuItem value="JavaScript">JavaScript</MenuItem>
+              <MenuItem value="React">React</MenuItem>
+            </Select>
+          </FormControl>
 
-        <FormControl fullWidth className={classes?.textField}>
-          <InputLabel>Status</InputLabel>
-          <Select
-            value={formState.status}
-            onChange={(e) => handleChange("status", e.target.value as string)}
-            endAdornment={
-              formState.status && (
-                <InputAdornment position="end" className={classes?.closeButton}>
-                  <IconButton
-                    onClick={() => handleClear("status")}
-                    edge="end"
+          <FormControl fullWidth className={classes?.textField}>
+            <InputLabel id="status-type-label">Status</InputLabel>
+            <Select
+              labelId="status-type-label"
+              value={formState.status}
+              onChange={(e) => handleChange("status", e.target.value as string)}
+              label="Status"
+              endAdornment={
+                formState.status && (
+                  <InputAdornment
+                    position="end"
+                    className={classes?.closeButton}
                   >
-                    <Clear />
-                  </IconButton>
-                </InputAdornment>
-              )
-            }
-          >
-            <MenuItem value="active">Active</MenuItem>
-            <MenuItem value="inactive">Inactive</MenuItem>
-          </Select>
-        </FormControl>
-        <TextField
-          type="number"
-          label="Openings"
-          fullWidth
-          value={formState.openings}
-          onChange={(e) => handleChange("openings", parseInt(e.target.value))}
-          className={classes?.textField}
-        />
+                    <IconButton
+                      onClick={() => handleClear("status")}
+                      edge="end"
+                    >
+                      <Clear />
+                    </IconButton>
+                  </InputAdornment>
+                )
+              }
+            >
+              <MenuItem value="active">Active</MenuItem>
+              <MenuItem value="inactive">Inactive</MenuItem>
+            </Select>
+          </FormControl>
+        </Box>
       </Box>
       <Box mt={2} display="flex" justifyContent="flex-end">
         <Button
