@@ -46,6 +46,21 @@ const styles = (theme: any) => ({
   jobAddForm: {
     backgroundColor: "#ffffff",
     padding: "1.5rem",
+    overflowY: "auto",
+    "&::-webkit-scrollbar": {
+      width: "0.4rem",
+    },
+    "&::-webkit-scrollbar-track": {
+      background: "#E5EDF9",
+      borderRadius: "10px",
+    },
+    "&::-webkit-scrollbar-thumb": {
+      background: "#9eaabb",
+      borderRadius: "10px",
+    },
+    "&::-webkit-scrollbar-thumb:hover": {
+      background: "#92a1b4",
+    },
   },
   heading: {
     color: "#071C50",

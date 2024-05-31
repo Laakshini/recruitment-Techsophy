@@ -61,21 +61,7 @@ const styles = (theme: any) => ({
     p: 4,
     maxHeight: "90%",
     width: "40%",
-    overflowY: "auto",
-    "&::-webkit-scrollbar": {
-      width: "0.4rem",
-    },
-    "&::-webkit-scrollbar-track": {
-      background: "#E5EDF9",
-      borderRadius: "10px",
-    },
-    "&::-webkit-scrollbar-thumb": {
-      background: "#9eaabb",
-      borderRadius: "10px",
-    },
-    "&::-webkit-scrollbar-thumb:hover": {
-      background: "#92a1b4",
-    },
+    
   },
   loader: {
     color: theme.palette.secondary.main,
