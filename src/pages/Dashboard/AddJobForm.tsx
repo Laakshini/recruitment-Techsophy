@@ -20,6 +20,7 @@ import { useTheme } from "@emotion/react";
 import { Clear } from "@mui/icons-material";
 import { request } from "../../services/Request";
 import { ADD_JOBS } from "../../constants/endpoints";
+import { v4 as uuidv4 } from "uuid";
 const cities = [
   "Delhi",
   "Mumbai",
@@ -115,13 +116,15 @@ const AddJobForm: React.FC<JobFormProps> = ({ handleClose }) => {
     endDate: null as Date | null,
     status: "",
     openings: 0,
+    package: '10L'
   });
 
   const handleSave = async () => {
+    const form= {...formState, jobId: uuidv4()}
     console.log("Form State:", formState);
     const response = await request.post(
       `${process.env.REACT_APP_API_GATEWAY_URL}${ADD_JOBS}`,
-      formState
+      form
     );
     console.log(response);
   };
@@ -446,3 +449,5 @@ const AddJobForm: React.FC<JobFormProps> = ({ handleClose }) => {
 };
 
 export default AddJobForm;
+
+
